@@ -1,0 +1,76 @@
+
+ENTITY hi_pri8b IS
+PORT(
+d: IN BIT_VECTOR(7 downto 0);
+q: OUT INTEGER RANGE (0 to 7);
+END hi_pri8b;
+ARCHITECTURE a OF hi_pri8b IS
+BEGIN
+q <= 7 WHEN d(7)='1' ELSE
+6 WHEN d(6)='1' ELSE
+5 WHEN d(5)='1' ELSE
+4 WHEN d(4)='1' ELSE
+3 WHEN d(3)='1' ELSE
+2 WHEN d(2)='1' ELSE
+1 WHEN d(1)='1' ELSE
+0;
+END a;
+
+ENTITY sevsegrb IS
+PORT(
+-- Use separate I/Os, not bus
+d3, d2, d1, d0: IN BIT; 
+nRBI: IN BIT :=‘0’; -- set up the initial value
+a, b, c, d, e, f, g, nRBO: OUT BIT);
+END sevsegrb;
+ARCHITECTURE seven_segment OF sevsegrb IS
+-- Bit vectors for internal use
+SIGNAL input: BIT_VECTOR (3 DOWNTO 0); 
+-- in decoder CASE statement
+SIGNAL output: BIT_VECTOR (6 DOWNTO 0); 
+BEGIN
+-- Concatenate inputs to make bit vector
+input <= d3 & d2 & d1 & d0; 
+-- Process Statement
+assign_out: PROCESS (input, nRBI)
+BEGIN
+IF(nRBI = '0' and input = "0000") THEN
+output <= "1111111"; -- 0 suppressed
+nRBO <= '0'; -- Next 0 suppressed
+ELSE
+nRBO <= '1'; -- Next 0 displayed
+CASE input IS
+WHEN "0000" =>
+output <= "0000001"; -- 0
+WHEN "0001" =>
+output <= "1001111"; -- 1
+WHEN "0010" =>
+output <= "0010010"; -- 2
+WHEN "0011" =>
+output <= "0000110"; -- 3
+WHEN "0100" =>
+output <= "1001100"; -- 4
+WHEN "0101" =>
+output <= "0100100"; -- 5
+WHEN "0110" =>
+output <= "1100000"; -- 6
+WHEN "0111" =>
+output <= "0001111"; -- 7
+WHEN "1000" =>
+output <= "0000000"; -- 8
+WHEN "1001" =>
+output <= "0001100"; -- 9
+WHEN others =>
+output <= "1111111"; -- blank
+END CASE;
+END IF;
+END PROCESS assign_out;
+-- pin outputs.
+a <= output(6);
+b <= output(5);
+c <= output(4);
+d <= output(3);
+e <= output(2);
+f <= output(1);
+g <= output(0);
+END seven_segment;

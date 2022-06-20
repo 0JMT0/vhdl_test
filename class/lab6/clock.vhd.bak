@@ -1,0 +1,36 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+ENTITY FrequencyDivider IS
+PORT (Hex0, Hex1, Hex2, Hex3: OUT STD_LOGIC_VECTOR(0 to 7));
+END FrequencyDivider;
+ARCHITECTURE a OF FrequencyDivider IS
+CONSTANT DigitValue: INTEGER := 16;
+TYPE MMSS is array (0 to 3) of INTEGER RANGE 0 to DigitValue;
+SIGNAL digits: MMSS;
+TYPE SEVENSEGMENT is array (0 to 3) of STD_LOGIC_VECTOR(0 to 7);
+SIGNAL segments: SEVENSEGMENT;
+BEGIN
+-- show 7-segment
+Hex0 <= segments(0);
+Hex1 <= segments(1);
+Hex2 <= segments(2);
+Hex3 <= segments(3);
+PROCESS(all)
+BEGIN
+FOR i IN 0 to 3 LOOP
+CASE digits(i) IS
+WHEN 0=> segments(i)<="00000011"; -- 0
+WHEN 1=> segments(i)<="10011111"; -- 1
+WHEN 2=> segments(i)<="00100101“; -- 2
+WHEN 3=> segments(i)<="00001101"; -- 3
+WHEN 4=> segments(i)<="10011001"; -- 4
+WHEN 5=> segments(i)<="01001001"; -- 5
+WHEN 6=> segments(i)<="11000001"; -- 6
+WHEN 7=> segments(i)<="00011111"; -- 7
+WHEN 8=> segments(i)<="00000001"; -- 8
+WHEN 9=> segments(i)<="00011001"; -- 9
+WHEN others =>segments(i)<="11111111";
+END CASE;
+END LOOP;
+segments(2)(7) <= '0'; -- display "dot"
+END PR
